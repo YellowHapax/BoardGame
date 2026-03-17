@@ -1,0 +1,90 @@
+# BoardGame — YellowHapax
+
+> A two-player pass-and-play abstract strategy game running in the browser. A 5×5 grid. Three piece types. Two ways to win. No luck. The entire game fits in one screen; two people sit down at the same machine and play.
+
+## Live
+
+https://yellowhapax.github.io/BoardGame/
+
+## What It Is
+
+Two players take turns placing and moving pieces on a 5×5 board. Player 0 and Player 1 share one keyboard and screen. Each player starts with 21 stones and 1 capstone.
+
+The goal is to build a road — an unbroken orthogonal chain of your pieces connecting any two opposite edges of the board.
+
+## The Three Piece Types
+
+**Flat** — Lies horizontal. Counts as road-building material. Can be stacked on. The default placement choice.
+
+**Wall** — Stands vertical. Blocks roads (yours and theirs). Cannot be moved through normally. Counts as neither player's road. Useful for cutting off opponent paths.
+
+**Cap (Capstone)** — A dome. Each player has exactly one. Builds roads. Can flatten a standing Wall by moving onto it alone — the only piece with this ability. Cannot be stacked over; it terminates any stack it tops.
+
+## Two Ways to Win
+
+**Road Win** — Connect your two opposite edges (top↔bottom or left↔right) with an unbroken orthogonal chain of your flats and/or caps. Diagonals do not count. Walls do not count. This is checked immediately when any piece is placed or a move completes.
+
+**Flat Win** — When every square on the board is occupied (no empty cells), count how many top-of-stack flats each player controls. Most flats wins. Walls and caps are ignored for this count. Tie is possible.
+
+A road win for the moving player is checked before the board-full condition.
+
+## Stack Movement
+
+Any stack you own (top piece is yours) can be picked up. You carry up to 5 pieces from the top of the stack. You then move in one cardinal direction, dropping at least one piece on each square you pass through. You cannot change direction mid-move. You cannot move through a cap. You cannot move through a wall unless your carried piece is a lone cap, which flattens the wall on contact.
+
+## Game Flow (Phases)
+
+```
+idle → [click own stack] → pickup
+idle → [click piece type in inventory] → place → [click empty square] → idle (turn passes)
+pickup → [choose carry count] → move → [click adjacent squares to drop] → idle (turn passes)
+```
+
+Cancelling a pickup returns all carried pieces to their origin square. Cancelling during place mode just deselects the piece type.
+
+## Implementation
+
+- React 19 + Vite 6, TypeScript
+- 3D rendering: Three.js via @react-three/fiber and @react-three/drei
+- State: Zustand store (`src/store.ts`) — single source of truth for board, inventory, phase, carried pieces, and win state
+- UI: Tailwind CSS v4, Lucide icons, overlaid HTML on top of the Canvas
+- No server. No backend. No accounts. Entirely client-side.
+
+## Source Layout
+
+```
+src/
+  store.ts          — All game logic: placement, movement, road-win BFS, flat-win count
+  App.tsx           — Root: GameCanvas + UI overlay
+  components/
+    GameCanvas.tsx  — Three.js Canvas, lighting, OrbitControls
+    Board3D.tsx     — 5×5 grid, tile geometry, brass edges, book-corner brackets
+    Piece3D.tsx     — Flat (extruded trapezoid), Wall (vertical trapezoid), Cap (hemisphere)
+    UI.tsx          — Inventory buttons, palette picker, win screen, cancel/reset controls
+```
+
+## Verified Mechanics (Test Suite)
+
+Road win:
+- Empty board does not win
+- Straight N-S line of flats wins
+- A wall in the path blocks the road
+- A cap in the path counts as road
+- Snake E-W path wins (orthogonal connectivity, not straight-line)
+- Opponent piece in path blocks
+- A cap on top of a mixed stack counts
+- Diagonal adjacency does not count
+
+Stack movement:
+- Carry count is correct
+- Pieces drop in correct order across squares
+- Phase returns to idle and turn passes after final drop
+- Rejections: moving off-axis, moving through a cap, moving through a wall without a lone cap
+- Wall flattening: lone cap flattens a wall; any other carried piece is rejected
+- Cap termination: cap always lands on top and cannot be moved over
+
+## Palettes
+
+12 named color pairs selectable in-game. Both players' pieces are always rendered in the active palette — Player 0 gets the first color, Player 1 the second.
+
+Default: Flame & Tide — orange (#ff6600) vs blue (#0099ff).
