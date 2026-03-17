@@ -1,79 +1,118 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BoardGame</title>
-    <meta name="description" content="A two-player abstract strategy board game" />
-    <script type="text/plain" id="llms">
-# BoardGame — YellowHapax
-
-> A two-player pass-and-play abstract strategy game running in the browser. A 5×5 grid. Three piece types. Two ways to win. No luck. The entire game fits in one screen; two people sit down at the same machine and play.
-
-## Live
-
-https://yellowhapax.github.io/BoardGame/
-
-## What It Is
-
-Two players take turns placing and moving pieces on a 5×5 board. Player 0 and Player 1 share one keyboard and screen. Each player starts with 21 stones and 1 capstone.
-
-The goal is to build a road — an unbroken orthogonal chain of your pieces connecting any two opposite edges of the board.
-
-## The Three Piece Types
-
-Flat — Lies horizontal. Counts as road-building material. Can be stacked on. The default placement choice.
-
-Wall — Stands vertical. Blocks roads (yours and theirs). Cannot be moved through normally. Counts as neither player's road. Useful for cutting off opponent paths.
-
-Cap (Capstone) — A dome. Each player has exactly one. Builds roads. Can flatten a standing Wall by moving onto it alone — the only piece with this ability. Cannot be stacked over; it terminates any stack it tops.
-
-## Two Ways to Win
-
-Road Win — Connect your two opposite edges (top↔bottom or left↔right) with an unbroken orthogonal chain of your flats and/or caps. Diagonals do not count. Walls do not count. This is checked immediately when any piece is placed or a move completes.
-
-Flat Win — When every square on the board is occupied (no empty cells), count how many top-of-stack flats each player controls. Most flats wins. Walls and caps are ignored for this count. Tie is possible.
-
-A road win for the moving player is checked before the board-full condition.
-
-## Stack Movement
-
-Any stack you own (top piece is yours) can be picked up. You carry up to 5 pieces from the top of the stack. You then move in one cardinal direction, dropping at least one piece on each square you pass through. You cannot change direction mid-move. You cannot move through a cap. You cannot move through a wall unless your carried piece is a lone cap, which flattens the wall on contact.
-
-## Game Flow (Phases)
-
-idle → [click own stack] → pickup
-idle → [click piece type in inventory] → place → [click empty square] → idle (turn passes)
-pickup → [choose carry count] → move → [click adjacent squares to drop] → idle (turn passes)
-
-Cancelling a pickup returns all carried pieces to their origin square. Cancelling during place mode just deselects the piece type.
-
-## Implementation
-
-React 19 + Vite 6, TypeScript. 3D rendering via Three.js / @react-three/fiber / @react-three/drei. State: Zustand. No server. No backend. No accounts. Entirely client-side.
-
-## Source Layout
-
-src/store.ts — All game logic: placement, movement, road-win BFS, flat-win count
-src/App.tsx — Root: GameCanvas + UI overlay
-src/components/GameCanvas.tsx — Three.js Canvas, lighting, OrbitControls
-src/components/Board3D.tsx — 5×5 grid, tile geometry, brass edges, book-corner brackets
-src/components/Piece3D.tsx — Flat (extruded trapezoid), Wall (vertical trapezoid), Cap (hemisphere)
-src/components/UI.tsx — Inventory buttons, palette picker, win screen, cancel/reset controls
-
-## Verified Mechanics
-
-Road win: empty board does not win; straight N-S line wins; wall in path blocks; cap counts as road; snake E-W path wins; opponent piece blocks; diagonal does not count.
-Stack movement: carry count correct; pieces drop in order; phase returns to idle after final drop; rejections for off-axis, through-cap, through-wall without lone cap; wall flattening by lone cap only; cap always terminates stack.
-
-## Palettes
-
-12 named color pairs selectable in-game. Default: Flame & Tide — orange (#ff6600) vs blue (#0099ff).
+    <meta name="description" content="A two-player pass-and-play abstract strategy game. 5x5 grid, three piece types, two ways to win. No luck." />
+    <meta name="keywords" content="abstract strategy game, board game, road game, two player, pass and play, 3D board game, browser game" />
+    <meta name="author" content="YellowHapax" />
+    <meta property="og:title" content="BoardGame" />
+    <meta property="og:description" content="A two-player pass-and-play abstract strategy game in the browser. 5x5 grid, three piece types, two ways to win." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yellowhapax.github.io/BoardGame/" />
+    <link rel="canonical" href="https://yellowhapax.github.io/BoardGame/" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "BoardGame",
+      "url": "https://yellowhapax.github.io/BoardGame/",
+      "description": "A two-player pass-and-play abstract strategy game running in the browser. A 5x5 grid, three piece types (flat, wall, capstone), and two win conditions (road win by connecting opposite edges, flat win by controlling the most top-of-stack flats when the board fills). No luck. No server. Entirely client-side.",
+      "applicationCategory": "Game",
+      "operatingSystem": "Web browser",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "about": [
+        { "@type": "Thing", "name": "Abstract Strategy" },
+        { "@type": "Thing", "name": "Road Building" },
+        { "@type": "Thing", "name": "Stack Movement" },
+        { "@type": "Thing", "name": "Two Player Game" }
+      ],
+      "featureList": [
+        "5x5 board with 3D rendering via Three.js",
+        "Three piece types: flat (road), wall (blocker), capstone (road + wall-flattener)",
+        "Road win: connect opposite edges with an orthogonal chain of your flats and caps",
+        "Flat win: most top-of-stack flats when board is full",
+        "Stack movement: carry up to 5 pieces, drop at least one per square, one cardinal direction",
+        "12 selectable color palettes",
+        "Pass-and-play: two players, one screen"
+      ]
+    }
     </script>
   </head>
   <body>
+    <section class="sr-only" aria-label="Application description for crawlers and assistants" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">
+      <h1>BoardGame</h1>
+      <p>
+        A two-player pass-and-play abstract strategy game running in the browser.
+        A 5x5 grid. Three piece types. Two ways to win. No luck.
+        Two people sit down at the same machine and play.
+      </p>
+
+      <section>
+        <h2>The Three Piece Types</h2>
+        <p>
+          Flat: lies horizontal, counts as road material, can be stacked on.
+          Wall: stands vertical, blocks roads for both players, cannot be moved through normally, does not count as road for either player.
+          Cap (Capstone): a dome, each player has exactly one, builds roads, can flatten a standing Wall by moving onto it alone — the only piece with this power. Cannot be stacked over; terminates any stack it tops.
+        </p>
+      </section>
+
+      <section>
+        <h2>Two Ways to Win</h2>
+        <p>
+          Road Win: connect your two opposite edges (top to bottom or left to right) with an unbroken orthogonal chain of your flats and caps. Diagonals do not count. Walls do not count. Checked immediately after every placement or move.
+        </p>
+        <p>
+          Flat Win: when every square on the board is occupied, count top-of-stack flats per player. Most flats wins. Walls and caps are ignored in this count. Tie is possible.
+          The road win for the moving player is checked before the board-full condition.
+        </p>
+      </section>
+
+      <section>
+        <h2>Stack Movement</h2>
+        <p>
+          Any stack you own (top piece is yours) can be picked up. Carry up to 5 pieces from the top.
+          Move in one cardinal direction, dropping at least one piece per square.
+          Cannot change direction mid-move.
+          Cannot move through a cap.
+          Cannot move through a wall unless your carried piece is a lone cap, which flattens the wall on contact.
+        </p>
+      </section>
+
+      <section>
+        <h2>Game Flow</h2>
+        <p>
+          idle: click a piece type in your inventory to enter place mode, then click any empty square to place.
+          idle: click your own stack to enter pickup mode, choose how many pieces to carry, then click adjacent squares to drop pieces one at a time.
+          Cancelling pickup returns all pieces to origin. Cancelling place deselects the piece type.
+          Turn passes after every completed placement or move.
+        </p>
+      </section>
+
+      <section>
+        <h2>Implementation</h2>
+        <p>
+          React 19 and Vite 6, TypeScript. 3D rendering via Three.js, @react-three/fiber, @react-three/drei.
+          State management via Zustand. No server. No backend. No accounts. Entirely client-side.
+          Board geometry: dark wood tiles with brass edge strips and book-corner bracket details.
+          Pieces: flat and wall are extruded trapezoids, cap is a hemisphere.
+          Lighting: warm key light from upper-left, secondary fill opposite, cool rim from below-back.
+        </p>
+      </section>
+
+      <section>
+        <h2>Verified Mechanics</h2>
+        <p>
+          Road win: empty board does not win; N-S flat line wins; wall in path blocks; cap counts as road; snake E-W path wins; opponent piece blocks; diagonal does not count.
+          Stack movement: carry count correct; pieces drop in order; phase returns to idle after final drop; rejections for off-axis, through-cap, through-wall without lone cap; wall flattening by lone cap only; cap always terminates.
+        </p>
+      </section>
+
+      <p>Full specification: <a href="/BoardGame/llms.txt">llms.txt</a></p>
+    </section>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
