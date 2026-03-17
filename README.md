@@ -1,20 +1,29 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+﻿# BoardGame
 
-# Run and deploy your AI Studio app
+A two-player pass-and-play abstract strategy game in the browser.
 
-This contains everything you need to run your app locally.
+**Play:** https://yellowhapax.github.io/BoardGame/
 
-View your app in AI Studio: https://ai.studio/apps/c557635d-8423-4ef9-aebf-42f49b2ce71b
+## Rules
 
-## Run Locally
+5×5 board. Two players share one screen. Each starts with 21 stones and 1 capstone.
 
-**Prerequisites:**  Node.js
+**Piece types**
+- **Flat** — lies horizontal, builds roads, can be stacked on
+- **Wall** — stands vertical, blocks roads for both players
+- **Cap** — one per player; builds roads; can flatten an opposing wall by moving onto it alone
 
+**Win conditions**
+- **Road win** — connect your two opposite edges with an unbroken orthogonal chain of your flats and caps
+- **Flat win** — if the board fills completely, most top-of-stack flats wins
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+**Moving stacks** — pick up to 5 pieces from the top of any stack you control, carry them in one cardinal direction, drop at least one per square.
+
+## Run locally
+
+```
+npm install
+npm run dev
+```
+
+Opens at `http://localhost:3000`.
